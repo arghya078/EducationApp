@@ -1,8 +1,9 @@
-import {clerkClient,} from "@clerk/express"
+import {clerkClient} from "@clerk/express"
 import {v2 as cloudinary} from 'cloudinary';
 import Course from '../models/Course.js';
 import Purchase from '../models/Purchase.js';
 import User from '../models/User.js';
+
 
 export const updateRoleToEducator = async (req, res) => {
     try {
@@ -10,13 +11,13 @@ export const updateRoleToEducator = async (req, res) => {
 
         await clerkClient.users.updateUserMetadata(userId, {
             publicMetadata: {
-                role: 'educator'
+                role: 'educator',
             }
         });
 
         res.json({
             success: true,
-            message: 'You cab publish course now',
+            message: 'You can publish course now',
         });
         
     } catch (error) {

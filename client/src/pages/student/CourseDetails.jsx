@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { useContext } from "react";
@@ -8,6 +8,9 @@ import { assets } from "../../assets/assets";
 import humanizeDuration from "humanize-duration";
 import Footer from "../../components/students/Footer";
 import Youtube from "react-youtube";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -17,18 +20,59 @@ const CourseDetails = () => {
   const [playerData, setPlayerData] = useState(null);
 
   const { allCourses, calculateRating, calculateChapterTime, currency, calculateCourseDuration,
-    calculateNoOfLectures
+    calculateNoOfLectures, backendUrl, userData, getToken
    } =
     useContext(AppContext);
 
   const fetchCourseData = async () => {
-    const findCourse = allCourses.find((course) => course._id === id);
-    setCourseData(findCourse);
+    try {
+      const {data} = await axios.get(backendUrl + "/api/course/" + id);
+      if (data.success) {
+        setCourseData(data.course);
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
   };
+
+  const enrollCourse = async () => {
+    try {
+      if(!userData){
+        return toast.warn("Please login to enroll in the course")
+      
+      }
+      if(isAlreadyEnrolled){
+        return toast.warn("You are already enrolled in this course")
+      }
+      const token = await getToken()
+      const {data} = await axios.post(backendUrl + "/api/user/purchase",{
+        courseId: courseData._id},{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }})
+      if(data.success){
+        const {session_url} = data
+        window.location.replace(session_url)
+      }else{
+        toast.error(data.message)
+      }
+
+    } catch (error) {
+      toast.error("Something went wrong")
+    }
+  }
 
   useEffect(() => {
     fetchCourseData();
-  }, [id, allCourses]);
+  }, []);
+
+  useEffect(() => {
+    if(userData && courseData){
+      setIsAlreadyEnrolled(userData.enrolledCourses.includes(courseData._id));
+    }
+  }, [userData, courseData]);
 
   const toggleSection = (index) => {
     setOpenSection((prev) => ({
@@ -83,8 +127,8 @@ const CourseDetails = () => {
           </div>
 
           <p className="pt-4 md:text-base text-sm">
-            Course by{" "}
-            <span className="text-blue-600 underline"> John Doe </span>
+            Course by
+            <span className="text-blue-600 underline"> {courseData.educator.name} </span>
           </p>
 
           <div className="pt-8 text-gray-800">
@@ -210,7 +254,7 @@ const CourseDetails = () => {
                </div>
                
             </div>
-            <button className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">{isAlreadyEnrolled ? 'Continue Learning' : 'Enroll Now'}</button>
+            <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">{isAlreadyEnrolled ? 'Continue Learning' : 'Enroll Now'}</button>
 
             <div>
               <p className="md:text-xl text-lg font-medium mt-6 text-gray-800">What's in the course?</p>
