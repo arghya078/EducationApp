@@ -77,7 +77,7 @@ export const AppContextProvider = (props) => {
         course.courseRatings.forEach(rating => {
             total += rating.rating
         })
-        return Math.floor(totalRating/course.courseRatings.length)
+        return Math.floor(total/course.courseRatings.length)
     }
 
     // function to calculate course chapter time
@@ -145,14 +145,14 @@ export const AppContextProvider = (props) => {
             fetchUserData()
             fetchUserEnrolledCourses()
         }
-    })
+    }, [user])
 
-    const value = {
+    const contextValue = {
         currency,allCourses,navigate,calculateRating,isEducator,setIsEducator,calculateChapterTime,calculateCourseDuration,calculateNoOfLectures,enrolledCourses,fetchUserEnrolledCourses,backendUrl,userData,fetchUserData,getToken,fetchAllCourses
 
     }
     return (
-        <AppContext.Provider value={value}>
+        <AppContext.Provider value={contextValue}>
         {props.children}
         </AppContext.Provider>
     );

@@ -1,4 +1,4 @@
-import React, { use, useContext } from 'react'
+import React, { useContext } from 'react'
 import { AppContext } from '../../context/AppContext'
 import Searchbar from '../../components/students/Searchbar'
 import { useParams } from 'react-router-dom'

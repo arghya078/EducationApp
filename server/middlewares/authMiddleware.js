@@ -10,7 +10,7 @@ export const protectEducator = async (req, res, next) => {
         if (response.publicMetadata.role !== 'educator') {
             return res.json({
                 success: false,
-                message: 'You are not authorized to access',
+                message: 'Unauthorized to access',
             });
         }
 

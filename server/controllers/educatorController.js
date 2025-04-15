@@ -102,8 +102,7 @@ export const getEducatorDashboardData = async (req, res) => {
         const enrolledStudentsData = [];
         for (const course of courses){
             const students = await User.find({
-                _id: {$in: course.enrolledStudents},
-                courseTitle: course.title,
+                _id: {$in: course.enrolledStudents}
             },'name imageUrl');
 
             students.forEach(student => {
@@ -143,7 +142,7 @@ export const getEnrolledStudentsData = async (req, res) => {
             return {
                 student: purchase.userId,
                 courseTitle: purchase.courseId.courseTitle,
-                purchaseDate: purchase.createdAt,
+                purchaseDate: purchase.createdAt
             };
         });
         res.json({
